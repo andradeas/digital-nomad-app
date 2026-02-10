@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { ScrollView } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { Box, BoxProps } from "./Box";
 
 export function Screen({
@@ -11,13 +11,18 @@ export function Screen({
   const Container = scrollable ? ScrollView : Box;
 
   return (
-    <Box
-      flex={1}
-      backgroundColor="background"
-      paddingHorizontal="padding"
-      {...boxProps}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Container>{children}</Container>
-    </Box>
+      <Box
+        flex={1}
+        backgroundColor="background"
+        paddingHorizontal="padding"
+        {...boxProps}
+      >
+        <Container showsVerticalScrollIndicator={false}>{children}</Container>
+      </Box>
+    </KeyboardAvoidingView>
   );
 }
