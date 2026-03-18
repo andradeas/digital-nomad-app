@@ -4,6 +4,7 @@ import { useCityFindAll } from "@/src/domain/city/operations/useCityFindAll";
 import { Box } from "@/src/ui/components/Box";
 import { CityCard } from "@/src/ui/components/CityCard";
 import { Screen } from "@/src/ui/components/Screen";
+import { Text } from "@/src/ui/components/Text";
 import { CityFilter } from "@/src/ui/containers/CityFilter";
 import { useAppTheme } from "@/src/ui/theme/useAppTheme";
 import { useDebounce } from "@/src/utils/hooks/useDebounce";
@@ -21,10 +22,14 @@ export default function HomeScreen() {
 
   const debouncedCityName = useDebounce(cityName);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    null
+    null,
   );
 
-  const { data: cities } = useCityFindAll({
+  const {
+    data: cities,
+    isLoading,
+    error,
+  } = useCityFindAll({
     name: debouncedCityName,
     categoryId: selectedCategoryId,
   });
@@ -38,6 +43,24 @@ export default function HomeScreen() {
     return (
       <Box paddingHorizontal="padding">
         <CityCard cityPreview={item} />
+      </Box>
+    );
+  }
+
+  function renderEmptyComponent() {
+    let Content;
+
+    if (isLoading) {
+      Content = <Text>carregando cidades...</Text>;
+    } else if (error) {
+      Content = <Text>erro ao carregar cidades. {error.message}</Text>;
+    } else {
+      Content = <Text>não há cidades no momento</Text>;
+    }
+
+    return (
+      <Box alignSelf="center" mt="s32">
+        {Content}
       </Box>
     );
   }
@@ -56,6 +79,7 @@ export default function HomeScreen() {
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={renderEmptyComponent()}
         ListHeaderComponent={
           <CityFilter
             categories={categories}
